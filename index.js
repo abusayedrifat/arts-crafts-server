@@ -11,7 +11,7 @@ app.get('/',(req,res)=>{
     res.send('arts and crafts server is running')
 })
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 // const uri = "mongodb://localhost:27017/"
 const uri = `mongodb+srv://${process.env.DB_User}:${process.env.DB_Pass}@cluster0.faxnq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
@@ -33,10 +33,10 @@ async function run() {
     const craftsCollection = client.db('craftsDB').collection('art&crafts')
     const userColllection  = client.db('craftsUserDB').collection('users')
      
+    //=====users api========
     app.post('/users',async(req,res)=>{
         const users = req.body
         console.log(users);
-        
         const result = await userColllection.insertOne(users)
         res.send(result)
     })
@@ -45,6 +45,98 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result)
     })
+
+    //=======addding crafts api=======
+
+    app.post('/crafts',async(req,res)=>{
+        const crafts = req.body
+        console.log(crafts);
+        const result = await craftsCollection.insertOne(crafts)
+        res.send(result)     
+    })
+
+
+    //===== get all crafts data ========
+    app.get('/crafts',async(req,res)=>{
+        const cusrsor = craftsCollection.find()
+        const result = await cusrsor.toArray()
+        res.send(result)
+
+    })
+    app.get('/crafts/:id', async(req,res)=>{
+      const findId = req.params.id
+      const query = {
+        _id: new ObjectId(findId) 
+      }
+      const result = await craftsCollection.findOne(query)
+      res.send(result)
+    })
+
+    //===== get crafts data by category ====
+
+    app.get('/category/LandscapePainting',async(req,res)=>{
+      const query = {
+        subcategory: {
+          $in: ["Landscape Painting"]
+        }
+      }
+      const cursor = craftsCollection.find(query)
+      const  result = await cursor.toArray()
+      res.send(result)
+    })
+    app.get('/category/OilPainting',async(req,res)=>{
+      const query = {
+        subcategory: {
+          $in: ["Oil Painting"]
+        }
+      }
+      const cursor = craftsCollection.find(query)
+      const  result = await cursor.toArray()
+      res.send(result)
+    })
+
+    app.get('/category/WaterCoolorPainting',async(req,res)=>{
+      const query = {
+        subcategory: {
+          $in: ["Water Coolor Painting"]
+        }
+      }
+      const cursor = craftsCollection.find(query)
+      const  result = await cursor.toArray()
+      res.send(result)
+    })
+
+    app.get('/category/PortraitDrawing',async(req,res)=>{
+      const query = {
+        subcategory: {
+          $in: ["Portrait Drawing"]
+        }
+      }
+      const cursor = craftsCollection.find(query)
+      const  result = await cursor.toArray()
+      res.send(result)
+    })
+    app.get('/category/CharcoalSketching',async(req,res)=>{
+      const query = {
+        subcategory: {
+          $in: ["Charcoal Sketching"]
+        }
+      }
+      const cursor = craftsCollection.find(query)
+      const  result = await cursor.toArray()
+      res.send(result)
+    })
+    app.get('/category/CartoonDrawing',async(req,res)=>{
+      const query = {
+        subcategory: {
+          $in: ["Cartoon Drawing"]
+        }
+      }
+      const cursor = craftsCollection.find(query)
+      const  result = await cursor.toArray()
+      res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
