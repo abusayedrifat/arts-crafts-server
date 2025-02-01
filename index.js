@@ -68,8 +68,22 @@ async function run() {
       res.send(result)
 
     });
+
+  
+
     
-    app.get('/crafts/:email', async(req,res) => {
+// ===get data by id ==========
+    app.get('/crafts/:id', async (req, res) => {
+      const findId = req.params.id
+      const query = {
+        _id:new ObjectId(findId)
+      }
+      const result = await craftsCollection.findOne(query)
+      res.send(result)
+    })
+
+  // ====== get crafts data byspecific user===== make sure pathname is not same for 2 queries
+    app.get('/crafts/specificUser/:email', async(req,res) => {
       const findEmail = req.params.email
       const query = {
         email: findEmail
@@ -77,22 +91,45 @@ async function run() {
       const result = await craftsCollection.find(query).toArray()
       res.send(result)
     })
+    //==== update data =====
 
-    
-
-    app.get('/crafts/:id', async (req, res) => {
+    app.put('/crafts/:id',async(req,res)=>{
       const findId = req.params.id
+      const updateCrafts = req.body
       const query = {
-        _id: new ObjectId(findId)
+        _id: new ObjectId(findId) 
       }
-      const result = await craftsCollection.findOne(query)
+      const options = {
+        $upsert:true
+      }
+      const updateDoc = {
+        $set:{
+          imgURL:updateCrafts.imgURL,
+          itemName:updateCrafts.itemName,
+          subcategory:updateCrafts.subcategory,
+          shortDes:updateCrafts.shortDes,
+          price:updateCrafts.price,
+          ratings:updateCrafts.ratings,
+          customization:updateCrafts.customization,
+          processingTime:updateCrafts.processingTime,
+          stockStatus:updateCrafts.stockStatus
+        }
+      }
+      const result = await craftsCollection.updateOne(query,updateDoc,options)
       res.send(result)
     })
-
  
 
+    //=====delete specific users crafts====
 
-
+    app.delete('/crafts/:id',async(req,res)=>{
+      const findId = req.params.id
+      const query ={
+        _id: new ObjectId(findId)
+      }
+      const result = await craftsCollection.deleteOne(query)
+      res.send(result)
+    })
 
 
     //===== get crafts data by category ====
@@ -158,7 +195,7 @@ async function run() {
       res.send(result)
     })
 
-    // ====== get crafts data by user=====
+    
 
    
     // Send a ping to confirm a successful connection
