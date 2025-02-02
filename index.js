@@ -154,7 +154,7 @@ async function run() {
       const result = await cursor.toArray()
       res.send(result)
     })
-    app.get('/category/WaterCoolorPainting', async (req, res) => {
+    app.get('/category/WaterColorPainting', async (req, res) => {
       const query = {
         subcategory: {
           $in: ["Water Coolor Painting"]
